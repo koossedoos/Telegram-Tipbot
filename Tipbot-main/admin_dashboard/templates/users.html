@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+
+{% block title %}Users - Community Tipbot Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>👥 User Management</h2>
+                <div>
+                    <button class="btn btn-primary" onclick="refreshUsers()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- User Statistics -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="card-title">{{ stats.total_users }}</h4>
+                                    <p class="card-text">Total Users</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-users fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="card-title">{{ stats.active_users }}</h4>
+                                    <p class="card-text">Active (24h)</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-user-check fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="card-title">{{ stats.new_users_today }}</h4>
+                                    <p class="card-text">New Today</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-user-plus fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="card-title">{{ stats.users_with_balance }}</h4>
+                                    <p class="card-text">With Balance</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-wallet fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Search and Filters -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" id="userSearch" placeholder="Search users...">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control" id="statusFilter">
+                                <option value="">All Users</option>
+                                <option value="active">Active (24h)</option>
+                                <option value="with_balance">With Balance</option>
+                                <option value="new">New Users</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control" id="sortBy">
+                                <option value="created_at">Registration Date</option>
+                                <option value="last_activity">Last Activity</option>
+                                <option value="total_tips">Total Tips</option>
+                                <option value="balance">Balance</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary btn-block" onclick="filterUsers()">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">User List</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover" id="usersTable">
+                            <thead>
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>Username</th>
+                                    <th>Registration</th>
+                                    <th>Last Activity</th>
+                                    <th>Tips Sent</th>
+                                    <th>Tips Received</th>
+                                    <th>Balance</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td>{{ user.user_id }}</td>
+                                    <td>
+                                        {% if user.username %}
+                                            @{{ user.username }}
+                                        {% else %}
+                                            <em>No username</em>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ user.created_at }}</td>
+                                    <td>
+                                        {% if user.last_activity %}
+                                            {{ user.last_activity }}
+                                        {% else %}
+                                            <em>Never</em>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ user.tips_sent or 0 }}</td>
+                                    <td>{{ user.tips_received or 0 }}</td>
+                                    <td>
+                                        {% if user.total_balance > 0 %}
+                                            <span class="badge badge-success">{{ "%.8f"|format(user.total_balance) }}</span>
+                                        {% else %}
+                                            <span class="badge badge-secondary">0</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if user.is_active %}
+                                            <span class="badge badge-success">Active</span>
+                                        {% else %}
+                                            <span class="badge badge-secondary">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-info" onclick="viewUser({{ user.user_id }})" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-warning" onclick="messageUser({{ user.user_id }})" title="Send Message">
+                                                <i class="fas fa-envelope"></i>
+                                            </button>
+                                            <button class="btn btn-danger" onclick="banUser({{ user.user_id }})" title="Ban User">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Details Modal -->
+<div class="modal fade" id="userModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">User Details</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="userModalBody">
+                <!-- User details will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Message User Modal -->
+<div class="modal fade" id="messageModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Send Message to User</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="messageForm">
+                    <input type="hidden" id="messageUserId">
+                    <div class="form-group">
+                        <label for="messageText">Message:</label>
+                        <textarea class="form-control" id="messageText" rows="4" placeholder="Enter your message..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="sendMessage()">Send Message</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function refreshUsers() {
+    location.reload();
+}
+
+function filterUsers() {
+    const search = document.getElementById('userSearch').value;
+    const status = document.getElementById('statusFilter').value;
+    const sort = document.getElementById('sortBy').value;
+    
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    if (status) params.append('status', status);
+    if (sort) params.append('sort', sort);
+    
+    window.location.href = '/admin/users?' + params.toString();
+}
+
+function viewUser(userId) {
+    fetch(`/admin/api/user/${userId}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('userModalBody').innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Basic Information</h6>
+                        <p><strong>User ID:</strong> ${data.user_id}</p>
+                        <p><strong>Username:</strong> ${data.username || 'N/A'}</p>
+                        <p><strong>Registration:</strong> ${data.created_at}</p>
+                        <p><strong>Last Activity:</strong> ${data.last_activity || 'Never'}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Statistics</h6>
+                        <p><strong>Tips Sent:</strong> ${data.tips_sent || 0}</p>
+                        <p><strong>Tips Received:</strong> ${data.tips_received || 0}</p>
+                        <p><strong>Rain Received:</strong> ${data.rain_received || 0}</p>
+                        <p><strong>Total Balance:</strong> ${data.total_balance || 0}</p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6>Wallet Addresses</h6>
+                        ${Object.entries(data.addresses || {}).map(([coin, addr]) => 
+                            `<p><strong>${coin}:</strong> <code>${addr}</code></p>`
+                        ).join('')}
+                    </div>
+                </div>
+            `;
+            $('#userModal').modal('show');
+        })
+        .catch(error => {
+            alert('Failed to load user details');
+        });
+}
+
+function messageUser(userId) {
+    document.getElementById('messageUserId').value = userId;
+    $('#messageModal').modal('show');
+}
+
+function sendMessage() {
+    const userId = document.getElementById('messageUserId').value;
+    const message = document.getElementById('messageText').value;
+    
+    if (!message.trim()) {
+        alert('Please enter a message');
+        return;
+    }
+    
+    fetch('/admin/api/message', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            user_id: userId,
+            message: message
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Message sent successfully');
+            $('#messageModal').modal('hide');
+            document.getElementById('messageText').value = '';
+        } else {
+            alert('Failed to send message: ' + data.error);
+        }
+    })
+    .catch(error => {
+        alert('Failed to send message');
+    });
+}
+
+function banUser(userId) {
+    if (confirm('Are you sure you want to ban this user?')) {
+        fetch(`/admin/api/user/${userId}/ban`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('User banned successfully');
+                location.reload();
+            } else {
+                alert('Failed to ban user: ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('Failed to ban user');
+        });
+    }
+}
+
+// Search functionality
+document.getElementById('userSearch').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        filterUsers();
+    }
+});
+</script>
+{% endblock %}

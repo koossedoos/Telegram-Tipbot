@@ -1,0 +1,90 @@
+{
+  "bot": {
+    "token": "YOUR_BOT_TOKEN_HERE",
+    "name": "Community Tipbot",
+    "admin_users": [123456789],
+    "allowed_groups": [],
+    "cooldown_seconds": 30,
+    "max_tip_amount": 1000000,
+    "min_tip_amount": 0.001
+  },
+  "features": {
+    "tipping": true,
+    "rain": true,
+    "airdrops": true,
+    "withdrawals": true,
+    "deposits": true,
+    "backup": true
+  },
+  "coins": {
+    "AEGS": {
+      "enabled": true,
+      "cli_path": "aegisum-cli",
+      "decimals": 8,
+      "min_confirmations": 3,
+      "withdrawal_fee": 0.001,
+      "network_fee": 0.0001,
+      "rpc_host": "127.0.0.1",
+      "rpc_port": 8332,
+      "rpc_user": "aegisumrpc",
+      "rpc_password": "CHANGE_THIS_PASSWORD"
+    },
+    "SHIC": {
+      "enabled": true,
+      "cli_path": "shibacoin-cli",
+      "decimals": 8,
+      "min_confirmations": 6,
+      "withdrawal_fee": 0.01,
+      "network_fee": 0.001,
+      "rpc_host": "127.0.0.1",
+      "rpc_port": 8333,
+      "rpc_user": "shibacoirpc",
+      "rpc_password": "CHANGE_THIS_PASSWORD"
+    },
+    "PEPE": {
+      "enabled": true,
+      "cli_path": "pepecoin-cli",
+      "decimals": 8,
+      "min_confirmations": 6,
+      "withdrawal_fee": 0.01,
+      "network_fee": 0.001,
+      "rpc_host": "127.0.0.1",
+      "rpc_port": 8334,
+      "rpc_user": "pepecoirpc",
+      "rpc_password": "CHANGE_THIS_PASSWORD"
+    },
+    "ADVC": {
+      "enabled": true,
+      "cli_path": "advc-cli",
+      "decimals": 8,
+      "min_confirmations": 6,
+      "withdrawal_fee": 0.01,
+      "network_fee": 0.001,
+      "rpc_host": "127.0.0.1",
+      "rpc_port": 8335,
+      "rpc_user": "advcrpc",
+      "rpc_password": "CHANGE_THIS_PASSWORD"
+    }
+  },
+  "database": {
+    "path": "data/tipbot.db"
+  },
+  "security": {
+    "encryption_key": "GENERATE_RANDOM_KEY_HERE",
+    "backup_encryption": true,
+    "require_backup_confirmation": true
+  },
+  "notifications": {
+    "pending_tx": true,
+    "confirmed_tx": true,
+    "deposit_detected": true,
+    "withdrawal_sent": true
+  },
+  "admin_dashboard": {
+    "enabled": true,
+    "port": 12000,
+    "host": "0.0.0.0",
+    "username": "admin",
+    "password": "CHANGE_THIS_PASSWORD"
+  }
+}

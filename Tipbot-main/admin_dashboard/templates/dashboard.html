@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Community Tipbot Admin{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Statistics Cards -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">Total Users</div>
+                        <div class="h5 mb-0 font-weight-bold">{{ stats.total_users or 0 }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-white-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">Active Users (24h)</div>
+                        <div class="h5 mb-0 font-weight-bold">{{ stats.active_users_24h or 0 }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-user-clock fa-2x text-white-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">Total Tips</div>
+                        <div class="h5 mb-0 font-weight-bold">{{ stats.total_tips or 0 }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-hand-holding-usd fa-2x text-white-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">Tips Today</div>
+                        <div class="h5 mb-0 font-weight-bold">{{ stats.tips_today or 0 }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-calendar-day fa-2x text-white-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Coin Statistics -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-coins"></i> Coin Statistics
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if stats.coin_stats %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Coin</th>
+                                    <th>Tips</th>
+                                    <th>Total Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for coin, data in stats.coin_stats.items() %}
+                                <tr>
+                                    <td><strong>{{ coin }}</strong></td>
+                                    <td>{{ data.tip_count }}</td>
+                                    <td>{{ "%.8f"|format(data.total_amount) }}</td>
+                                    <td>
+                                        {% if config.coins[coin].enabled %}
+                                            <span class="badge bg-success">Enabled</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Disabled</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No coin statistics available yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- System Status -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-server"></i> System Status
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="text-center">
+                            <div class="h4 mb-0">{{ stats.total_rain or 0 }}</div>
+                            <div class="text-muted">Rain Events</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-center">
+                            <div class="h4 mb-0">{{ stats.total_withdrawals or 0 }}</div>
+                            <div class="text-muted">Withdrawals</div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="text-center">
+                            <div class="h4 mb-0 text-warning">{{ stats.pending_withdrawals or 0 }}</div>
+                            <div class="text-muted">Pending</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-center">
+                            {% set enabled_features = config.features.values() | select | list | length %}
+                            <div class="h4 mb-0 text-success">{{ enabled_features }}</div>
+                            <div class="text-muted">Features Active</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-history"></i> Recent Activity
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if recent_activity %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>From</th>
+                                    <th>To</th>
+                                    <th>Amount</th>
+                                    <th>Coin</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for activity in recent_activity %}
+                                <tr>
+                                    <td>
+                                        {% if activity.type == 'tip' %}
+                                            <span class="badge bg-primary">Tip</span>
+                                        {% elif activity.type == 'rain' %}
+                                            <span class="badge bg-info">Rain</span>
+                                        {% elif activity.type == 'withdrawal' %}
+                                            <span class="badge bg-warning">Withdrawal</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ activity.from_user or 'N/A' }}</td>
+                                    <td>{{ activity.to_user or 'N/A' }}</td>
+                                    <td>{{ "%.8f"|format(activity.amount) }}</td>
+                                    <td><strong>{{ activity.coin_symbol }}</strong></td>
+                                    <td>{{ activity.created_at }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No recent activity.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="powered-by">
+    Powered By Aegisum EcoSystem
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-refresh every 30 seconds
+setInterval(function() {
+    location.reload();
+}, 30000);
+
+// Real-time updates via API (optional)
+function updateStats() {
+    fetch('/api/stats')
+        .then(response => response.json())
+        .then(data => {
+            // Update statistics without full page reload
+            console.log('Stats updated:', data);
+        })
+        .catch(error => console.error('Error updating stats:', error));
+}
+
+// Update stats every 10 seconds
+setInterval(updateStats, 10000);
+</script>
+{% endblock %}

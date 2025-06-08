@@ -1,0 +1,185 @@
+{
+  "bot": {
+    "token": "YOUR_TELEGRAM_BOT_TOKEN_HERE",
+    "name": "Custom Multi-Coin Tipbot",
+    "admin_users": [YOUR_TELEGRAM_USER_ID],
+    "allowed_groups": [],
+    "cooldown_seconds": 30,
+    "max_tip_amount": 1000000,
+    "min_tip_amount": 0.001,
+    "privacy_mode": true,
+    "dm_only_commands": ["deposit", "withdraw", "backup", "seed"]
+  },
+  "features": {
+    "tipping": true,
+    "rain": true,
+    "airdrops": true,
+    "withdrawals": true,
+    "deposits": true,
+    "backup": true,
+    "faucet": true,
+    "dice_games": true,
+    "leaderboards": true,
+    "challenges": true,
+    "scheduled_tips": true,
+    "multi_signature": false,
+    "two_factor_auth": true,
+    "withdrawal_limits": true,
+    "suspicious_activity_detection": true
+  },
+  "coins": {
+    "AEGS": {
+      "enabled": true,
+      "full_name": "Aegisum",
+      "cli_path": "/usr/local/bin/aegisum-cli",
+      "daemon_path": "/usr/local/bin/aegisumd",
+      "decimals": 8,
+      "min_confirmations": 3,
+      "withdrawal_fee": 0.001,
+      "network_fee": 0.0001,
+      "min_amount": 0.00000001,
+      "max_amount": 1000000,
+      "rpc_host": "127.0.0.1",
+      "rpc_port": 8332,
+      "rpc_user": "aegisumrpc",
+      "rpc_password": "CHANGE_ME_SECURE_PASSWORD",
+      "explorer_url": "https://explorer.aegisum.com",
+      "explorer_tx": "https://explorer.aegisum.com/tx/",
+      "explorer_address": "https://explorer.aegisum.com/address/"
+    },
+    "ADVC": {
+      "enabled": true,
+      "full_name": "AdventureCoin",
+      "cli_path": "/usr/local/bin/advc-cli",
+      "daemon_path": "/usr/local/bin/advcd",
+      "decimals": 8,
+      "min_confirmations": 6,
+      "withdrawal_fee": 0.01,
+      "network_fee": 0.001,
+      "min_amount": 0.00000001,
+      "max_amount": 1000000,
+      "rpc_host": "127.0.0.1",
+      "rpc_port": 8335,
+      "rpc_user": "advcrpc",
+      "rpc_password": "CHANGE_ME_SECURE_PASSWORD",
+      "explorer_url": "https://explorer.advc.com",
+      "explorer_tx": "https://explorer.advc.com/tx/",
+      "explorer_address": "https://explorer.advc.com/address/"
+    },
+    "SHIC": {
+      "enabled": true,
+      "full_name": "ShibaCoin",
+      "cli_path": "/usr/local/bin/shibacoin-cli",
+      "daemon_path": "/usr/local/bin/shibacoind",
+      "decimals": 8,
+      "min_confirmations": 6,
+      "withdrawal_fee": 0.01,
+      "network_fee": 0.001,
+      "min_amount": 0.00000001,
+      "max_amount": 1000000,
+      "rpc_host": "127.0.0.1",
+      "rpc_port": 8333,
+      "rpc_user": "shibacoirpc",
+      "rpc_password": "CHANGE_ME_SECURE_PASSWORD",
+      "explorer_url": "https://explorer.shibacoin.com",
+      "explorer_tx": "https://explorer.shibacoin.com/tx/",
+      "explorer_address": "https://explorer.shibacoin.com/address/"
+    },
+    "PEPE": {
+      "enabled": true,
+      "full_name": "PepeCoin",
+      "cli_path": "/usr/local/bin/pepecoin-cli",
+      "daemon_path": "/usr/local/bin/pepecoind",
+      "decimals": 8,
+      "min_confirmations": 6,
+      "withdrawal_fee": 0.01,
+      "network_fee": 0.001,
+      "min_amount": 0.00000001,
+      "max_amount": 1000000,
+      "rpc_host": "127.0.0.1",
+      "rpc_port": 8334,
+      "rpc_user": "pepecoirpc",
+      "rpc_password": "CHANGE_ME_SECURE_PASSWORD",
+      "explorer_url": "https://explorer.pepecoin.com",
+      "explorer_tx": "https://explorer.pepecoin.com/tx/",
+      "explorer_address": "https://explorer.pepecoin.com/address/"
+    }
+  },
+  "database": {
+    "path": "data/tipbot.db"
+  },
+  "security": {
+    "encryption_key": "GENERATE_NEW_32_BYTE_KEY",
+    "backup_encryption": true,
+    "require_backup_confirmation": true,
+    "password_min_length": 8,
+    "require_2fa_for_withdrawals": true,
+    "withdrawal_cooling_period": 300,
+    "max_failed_attempts": 5,
+    "account_lockout_duration": 3600
+  },
+  "faucet": {
+    "enabled": true,
+    "cooldown_hours": 24,
+    "rewards": {
+      "AEGS": 0.1,
+      "ADVC": 5.0,
+      "SHIC": 10.0,
+      "PEPE": 100.0
+    },
+    "bonus_multiplier_range": [0.5, 2.0]
+  },
+  "dice": {
+    "enabled": true,
+    "min_bet": 0.1,
+    "max_bet": 100.0,
+    "house_edge": 0.05,
+    "payout_table": {
+      "1": 0,
+      "2": 0,
+      "3": 1,
+      "4": 1,
+      "5": 2,
+      "6": 3
+    }
+  },
+  "rain": {
+    "min_amount": 1.0,
+    "max_recipients": 50,
+    "participation_window": 300,
+    "min_chat_activity": 5
+  },
+  "airdrops": {
+    "min_amount": 10.0,
+    "max_duration": 3600,
+    "min_participants": 3,
+    "max_participants": 100
+  },
+  "withdrawal_limits": {
+    "default_daily_limit": 1000.0,
+    "vip_daily_limit": 10000.0,
+    "cooling_period_seconds": 300
+  },
+  "admin_dashboard": {
+    "enabled": true,
+    "port": 12000,
+    "host": "0.0.0.0",
+    "username": "admin",
+    "password": "CHANGE_ME_SECURE_PASSWORD",
+    "session_timeout": 3600,
+    "require_2fa": true
+  },
+  "monitoring": {
+    "transaction_monitoring": true,
+    "balance_monitoring": true,
+    "error_reporting": true,
+    "performance_metrics": true,
+    "suspicious_activity_threshold": 10
+  },
+  "backup": {
+    "automatic_reminders": true,
+    "reminder_frequency_days": 30,
+    "require_confirmation": true,
+    "encrypt_backups": true
+  }
+}

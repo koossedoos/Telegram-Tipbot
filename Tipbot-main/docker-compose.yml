@@ -1,0 +1,116 @@
+# Community Tipbot - Docker Compose Configuration
+# Powered By Aegisum EcoSystem
+
+version: '3.8'
+
+services:
+  tipbot:
+    build: .
+    container_name: community-tipbot
+    restart: unless-stopped
+    ports:
+      - "12000:80"      # Admin dashboard
+      - "12001:12000"   # Direct dashboard access
+    volumes:
+      # Configuration
+      - ./config/config.json:/app/config/config.json:ro
+      
+      # Data persistence
+      - tipbot_data:/app/data
+      - tipbot_logs:/app/logs
+      
+      # Wallet data (if using local wallets)
+      - tipbot_wallets:/app/data/wallets
+      
+      # Backups
+      - tipbot_backups:/app/data/backups
+    
+    environment:
+      - PYTHONUNBUFFERED=1
+      - TZ=UTC
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:12000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+
+  # Optional: Database backup service
+  backup:
+    image: alpine:latest
+    container_name: tipbot-backup
+    restart: unless-stopped
+    volumes:
+      - tipbot_data:/data:ro
+      - tipbot_backups:/backups
+    environment:
+      - TZ=UTC
+    command: >
+      sh -c "
+        while true; do
+          echo 'Creating backup...'
+          tar -czf /backups/tipbot-backup-$$(date +%Y%m%d-%H%M%S).tar.gz -C /data .
+          
+          # Keep only last 7 days of backups
+          find /backups -name 'tipbot-backup-*.tar.gz' -mtime +7 -delete
+          
+          # Sleep for 24 hours
+          sleep 86400
+        done
+      "
+
+  # Optional: Monitoring service
+  monitor:
+    image: alpine:latest
+    container_name: tipbot-monitor
+    restart: unless-stopped
+    volumes:
+      - tipbot_logs:/logs:ro
+    environment:
+      - TZ=UTC
+    command: >
+      sh -c "
+        apk add --no-cache curl
+        while true; do
+          # Check if tipbot is healthy
+          if ! curl -f http://tipbot:12000/health >/dev/null 2>&1; then
+            echo 'WARNING: Tipbot health check failed!'
+          fi
+          
+          # Check log file sizes
+          if [ -f /logs/bot.log ]; then
+            size=$$(du -m /logs/bot.log | cut -f1)
+            if [ $$size -gt 100 ]; then
+              echo 'WARNING: Bot log file is getting large ($$size MB)'
+            fi
+          fi
+          
+          sleep 300  # Check every 5 minutes
+        done
+      "
+
+volumes:
+  tipbot_data:
+    driver: local
+  tipbot_logs:
+    driver: local
+  tipbot_wallets:
+    driver: local
+  tipbot_backups:
+    driver: local
+
+networks:
+  default:
+    name: tipbot-network
